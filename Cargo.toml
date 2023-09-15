@@ -1,0 +1,16 @@
+[package]
+name = "py-drand-verify"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "drand_verify"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.19.0"
+drand-verify = { git = "https://github.com/noislabs/drand-verify.git" }
+hex = "0.4"
+hex-literal = "0.3.1"
+
