@@ -12,5 +12,3 @@ crate-type = ["cdylib"]
 pyo3 = "0.19.0"
 drand-verify = { git = "https://github.com/noislabs/drand-verify.git" }
 hex = "0.4"
-hex-literal = "0.3.1"
-
