@@ -213,7 +213,7 @@ dependencies = [
 
 [[package]]
 name = "py-drand-verify"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "drand-verify",
  "hex",

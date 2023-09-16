@@ -1,17 +1,9 @@
 use pyo3::prelude::*;
 use pyo3::exceptions;
+use ::drand_verify::{derive_randomness, G1Pubkey, G2Pubkey, G2PubkeyRfc, Pubkey};
 
-use ::drand_verify::{derive_randomness, G1Pubkey, G2PubkeyRfc, Pubkey};
-
-#[pyfunction]
-fn verify_pedersen_bls_chained(round: u64, prev_sig: &str, sig: &str, pk_str: &str) -> PyResult<String> {
-    let pk_data = hex::decode(pk_str).unwrap();
-    let pk = G1Pubkey::from_variable(pk_data.as_slice()).unwrap();
-
-    let previous_signature = hex::decode(prev_sig).unwrap();
-    let signature = hex::decode(sig).unwrap();
-
-    match pk.verify(round, previous_signature.as_slice(), signature.as_slice()) {
+fn do_verify(pk: impl Pubkey, round: u64, previous_signature: &[u8], signature: &[u8]) -> PyResult<String> {
+    match pk.verify(round, previous_signature, signature) {
         Err(err) => {
             Err(exceptions::PyValueError::new_err(format!("Error during verification: {}", err)))
         }
@@ -27,25 +19,35 @@ fn verify_pedersen_bls_chained(round: u64, prev_sig: &str, sig: &str, pk_str: &s
 }
 
 #[pyfunction]
+fn verify_pedersen_bls_chained(round: u64, prev_sig: &str, sig: &str, pk_str: &str) -> PyResult<String> {
+    let pk_data = hex::decode(pk_str).unwrap();
+    let pk = G1Pubkey::from_variable(pk_data.as_slice()).unwrap();
+
+    let previous_signature = hex::decode(prev_sig).unwrap();
+    let signature = hex::decode(sig).unwrap();
+
+    do_verify(pk, round, previous_signature.as_slice(), signature.as_slice())
+}
+
+// No alias for this as the fastnet is deprecated
+#[pyfunction]
+fn verify_bls_unchained_on_g1(round: u64, sig: &str, pk_str: &str) -> PyResult<String> {
+    let pk_data = hex::decode(pk_str).unwrap();
+    let pk = G2Pubkey::from_variable(pk_data.as_slice()).unwrap();
+
+    let signature = hex::decode(sig).unwrap();
+
+    do_verify(pk, round, &[], signature.as_slice())
+}
+
+#[pyfunction]
 fn verify_bls_unchained_g1_rfc9380(round: u64, sig: &str, pk_str: &str) -> PyResult<String> {
     let pk_data = hex::decode(pk_str).unwrap();
     let pk = G2PubkeyRfc::from_variable(pk_data.as_slice()).unwrap();
 
     let signature = hex::decode(sig).unwrap();
 
-    match pk.verify(round, &[], signature.as_slice()) {
-        Err(err) => {
-            Err(exceptions::PyValueError::new_err(format!("Error during verification: {}", err)))
-        }
-        Ok(valid) => {
-            if valid {
-                let randomness = derive_randomness(&signature);
-                Ok(hex::encode(randomness))
-            } else {
-                Err(exceptions::PyValueError::new_err("Verification Failed"))
-            }
-        }
-    }
+    do_verify(pk, round, &[], signature.as_slice())
 }
 
 #[pyfunction]
@@ -66,5 +68,6 @@ fn drand_verify(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(verify_quicknet, m)?)?;
     m.add_function(wrap_pyfunction!(verify_pedersen_bls_chained, m)?)?;
     m.add_function(wrap_pyfunction!(verify_mainnet, m)?)?;
+    m.add_function(wrap_pyfunction!(verify_bls_unchained_on_g1, m)?)?;
     Ok(())
 }
