@@ -93,7 +93,7 @@ jobs:
       - name: set up python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12-dev'
           architecture: ${{ matrix.python-architecture || 'x64' }}
           sccache: 'true'
 
