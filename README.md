@@ -4,9 +4,19 @@
 ### Made with [PyO3](https://github.com/PyO3/pyo3)
 
 ## Installation
+Install from [PyPi](https://pypi.org/project/drand-verify/)
 
 ```
 pip install drand-verify
+```
+
+Alternatively, you can build from source using [maturin](https://github.com/PyO3/maturin) (requires cargo and PyO3)
+```
+git clone https://github.com/very-lame-username/python-drand-verify.git
+cd python-drand-verify
+pip install maturin
+maturin build --release
+pip install ./target/wheels/whatever-the-wheel-is-called.whl
 ```
 
 ## Usage
