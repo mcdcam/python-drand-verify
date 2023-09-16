@@ -40,16 +40,12 @@ jobs:
             platform: linux
           - os: windows
             ls: dir
-            interpreter: 3.7 3.8 3.9 3.10 3.11 3.12 pypy3.8 pypy3.9 pypy3.10
+            interpreter: 3.7 3.8 3.9 3.10 3.11 3.12
           - os: windows
             ls: dir
             target: i686
             python-architecture: x86
             interpreter: 3.7 3.8 3.9 3.10 3.11 3.12
-          - os: windows
-            ls: dir
-            target: aarch64
-            interpreter: 3.11 3.12
           - os: macos
             target: aarch64
             interpreter: 3.7 3.8 3.9 3.10 3.11 3.12 pypy3.8 pypy3.9 pypy3.10
@@ -59,7 +55,6 @@ jobs:
           - os: ubuntu
             platform: linux
             target: aarch64
-
           - os: ubuntu
             platform: linux
             target: armv7
@@ -82,7 +77,7 @@ jobs:
             target: s390x
             interpreter: 3.7 3.8 3.9 3.10 3.11 3.12
         exclude:
-          # Windows on arm64 only supports Python 3.11+
+          # Windows on arm64 won't link properly
           - os: windows
             target: aarch64
 
@@ -95,7 +90,6 @@ jobs:
         with:
           python-version: '3.12-dev'
           architecture: ${{ matrix.python-architecture || 'x64' }}
-          sccache: 'true'
 
       - name: build wheels
         uses: PyO3/maturin-action@v1
@@ -106,6 +100,7 @@ jobs:
           args: --release --out dist --interpreter ${{ matrix.interpreter || '3.7 3.8 3.9 3.10 3.11 3.12 pypy3.7 pypy3.8 pypy3.9 pypy3.10' }} ${{ matrix.extra-build-args }}
           rust-toolchain: stable
           docker-options: -e CI
+          sccache: 'true'
 
       - run: ${{ matrix.ls || 'ls -lh' }} dist/
 
@@ -128,13 +123,12 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: release-files/*
-          prerelease: true
 
-#      - name: Publish to PyPI
-#        uses: PyO3/maturin-action@v1
-#        env:
-#          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-#        with:
-#          command: upload
-#          args: --non-interactive --skip-existing *
-#          working-directory: release-files
+      - name: Publish to PyPI
+        uses: PyO3/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        with:
+          command: upload
+          args: --non-interactive --skip-existing *
+          working-directory: release-files
