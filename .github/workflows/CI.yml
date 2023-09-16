@@ -93,9 +93,11 @@ jobs:
       - name: set up python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
           architecture: ${{ matrix.python-architecture || 'x64' }}
           sccache: 'true'
+
+      - run: echo "SETUPTOOLS_USE_DISTUTILS=no" >> $GITHUB_ENV
 
       - name: build wheels
         uses: PyO3/maturin-action@v1
