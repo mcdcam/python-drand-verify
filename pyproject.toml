@@ -22,4 +22,6 @@ keywords = ["drand", "cryptography"]
 Homepage = "https://github.com/very-lame-username/python-drand-verify"
 
 [tool.maturin]
+python-source = "python"
+bindings = 'pyo3'
 features = ["pyo3/extension-module"]
