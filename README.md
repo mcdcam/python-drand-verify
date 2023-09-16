@@ -3,6 +3,12 @@
 ## Based on [drand-verify](https://github.com/noislabs/drand-verify)
 ### Made with [PyO3](https://github.com/PyO3/pyo3)
 
+## Installation
+
+```
+pip install drand-verify
+```
+
 ## Usage
 
 #### Returns the randomness for the given round if the input is valid.
